@@ -10,6 +10,22 @@
 <body>
     <div class="container my-5 p-4 w-25 bg-teal-100 border border-0 rounded">
         <h2 class="text-center mt-2 mb-4">Đăng Ký Tài Khoản</h2>
+
+        <% if (errorMessage) { %>
+            <div class="alert alert-danger">
+                <%= errorMessage %>
+            </div>
+        <% } else if (successMessage) { %>
+            <div class="alert alert-success">
+                <%= successMessage %>
+            </div>
+            <script>
+                setTimeout(() => {
+                    window.location.href = '/login';
+                }, 1000);
+            </script>
+        <% } %>
+
         <form action="/create-new-user" method="POST" id="registration-form">
             <div class="mb-3">
                 <label for="fullname" class="form-label">Tên đầy đủ</label>
@@ -28,6 +44,12 @@
                 <input type="password" class="form-control" id="password" name="password" placeholder="Nhập mật khẩu" required>
                 <div id="password-error" class="error-message text-gray-700"></div>
                 <div id="password-strength" class="error-message text-gray-700"></div>
+            </div>
+
+            <div class="mb-3">
+                <label for="confirm-password" class="form-label">Nhập lại mật khẩu</label>
+                <input type="password" class="form-control" id="confirm-password" name="confirm-password" placeholder="Nhập lại mật khẩu" required>
+                <div id="confirm-password-error" class="error-message text-danger"></div>
             </div>
         
             <div class="mb-3">

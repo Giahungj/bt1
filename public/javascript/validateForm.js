@@ -1,6 +1,7 @@
 document.getElementById('fullname').addEventListener('input', validateFullname)
 document.getElementById('username').addEventListener('input', validateUsername)
 document.getElementById('password').addEventListener('input', validatePassword)
+document.getElementById('confirm-password').addEventListener('input', checkPasswordMatch)
 document.getElementById('email').addEventListener('input', validateEmail)
 document.getElementById('address').addEventListener('input', validateAddress)
 document.getElementById('role').addEventListener('change', validateRole)
@@ -30,6 +31,7 @@ function validateUsername() {
 function validatePassword() {
     const password = document.getElementById('password').value
     const errorMessage = document.getElementById('password-error')
+    
     const strengthMessage = document.getElementById('password-strength')
     strengthMessage.classList.remove('text-danger', 'text-warning', 'text-success')
 
@@ -49,6 +51,9 @@ function validatePassword() {
             strengthMessage.classList.add('text-success')
         }
     }
+
+    const checkPasswordMatch = checkPasswordMatch(password, confirmPassword)
+    
 }
 function checkPasswordStrength(password) {
     let strength = 'Yếu'
@@ -67,6 +72,17 @@ function checkPasswordStrength(password) {
     
     // Trả về độ mạnh của mật khẩu
     return strength
+}
+function checkPasswordMatch() {
+  const password = document.getElementById('password').value
+  const confirmPassword = document.getElementById('confirm-password').value
+  const errorConfirmMessage = document.getElementById('confirm-password-error')
+
+  if (password !== confirmPassword) {
+    errorConfirmMessage.textContent = 'Mật khẩu không khớp'
+  } else {
+    errorConfirmMessage.textContent = ''
+  }
 }
 
 function validateEmail() {

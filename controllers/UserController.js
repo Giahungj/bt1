@@ -1,18 +1,36 @@
 import { importUser } from "../model/useModel"
 import { checkUsernameExists } from "../model/useModel"
+import { checkEmailExists } from "../model/useModel"
+import { getHashPassword } from "../model/useModel"
 import bcrypt from 'bcrypt';
 
 export const getNewUserPage = (req, res) => {
-    res.render('pages/newUser', { title: 'Đăng ký' });
+    res.render('pages/newUser', { title: 'Đăng ký', successMessage: '', errorMessage: '' });
 };
 
 export const getLoginPage = (req, res) => {
-    res.render('pages/login', { title: 'Đăng nhập' });
+    res.render('pages/login', { title: 'Đăng nhập', errorMessage: '' });
 };
 
-export const authAccount = (req, res) => {
+export const authAccount = async (req, res) => {
     const { username, password } = req.body
-    console.log(username, password)
+    
+    if (!username || !password) {
+        return res.render('pages/login', { title: 'Đăng nhập', errorMessage: 'Vui lòng nhập đầy đủ thông tin!' })
+    }
+    
+    const isUsernameAvailable = await checkUsernameExists(username)
+    if (isUsernameAvailable) {
+        return res.render('pages/login', { title: 'Đăng nhập', errorMessage: 'Tài khoản này không tồn tại!' })
+    }
+
+    const hashPassword =  await getHashPassword(username)
+    const isPasswordValid = await comparePassword(password, hashPassword)
+    if (isPasswordValid) {
+        return res.redirect('/')
+    } else {
+        return res.render('pages/login', { title: 'Đăng nhập', errorMessage: 'Sai mật khẩu' })
+    }
 }
 
 export const createUser = async (req, res) => {
@@ -21,22 +39,30 @@ export const createUser = async (req, res) => {
 
     const isUsernameAvailable = await checkUsernameExists(username)
     if (!isUsernameAvailable) {
-        return res.status(400).json({ message: 'Tên người dùng đã tồn tại' })
+        return res.render('pages/newUser', { title: 'Đăng ký', successMessage: '', errorMessage: 'Tài khoản đã được sử dụng' })
     }
-    
+
+    const isEmailAvailable = await checkEmailExists(email)
+    if (!isEmailAvailable) {
+        return res.render('pages/newUser', { title: 'Đăng ký', successMessage: '', errorMessage: 'Email đã được sử dụng' })
+    }
+
     if (!username || !password) {
-        return res.status(400).json({ message: 'Username và password là bắt buộc' })
+        return res.render('pages/newUser', { title: 'Đăng ký', successMessage: '', errorMessage: 'Tên tài khoản và Mật khâủ là bắt buộc' })
     }
 
     const hashedPassword = await hashPassword(password)
-    console.log(console.log('Mật khẩu đã băm giai đoạn 2: ', hashedPassword ))
+    console.log('Mật khẩu đã băm giai đoạn 2: ', hashedPassword )
   
     try {
-        importUser(username, hashedPassword, fullname, gender, email, address, role)
-        return res.status(201).json({ message: 'Tạo người dùng thành công' })
+        const result = importUser(username, hashedPassword, fullname, address, gender, email, role)
+        if (!result) {
+            return res.render('pages/newUser', { title: 'Đăng ký', successMessage: '', errorMessage: 'Tạo tài khoản thất bại!' })
+        }
+        return res.render('pages/newUser', { title: 'Đăng ký', successMessage: 'Tạo tài khoản thành công', errorMessage: '' })
     } catch (error) {
-      console.error('Lỗi tạo người dùng:', error)
-      return res.status(500).json({ message: 'Đã có lỗi xảy ra' })
+        console.error('Lỗi tạo người dùng:', error)
+        res.render('pages/newUser', { title: 'Đăng ký', errorMessage: error })
     }
 }
 
@@ -49,3 +75,13 @@ const hashPassword = async (password) => {
         throw new Error('Không thể hash mật khẩu')
     }
 }
+
+export const comparePassword = async (password, hashPassword) => {
+    try {
+        return await bcrypt.compare(password, hashPassword)
+    } catch (error) {
+        console.error('Lỗi khi so sánh mật khẩu:', error)
+        return false
+    }
+  }
+  

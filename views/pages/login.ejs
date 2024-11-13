@@ -11,6 +11,13 @@
     <div class="container-fluid py-5 vh-100 bg-cyan-100">
         <div class="container border border-0 rounded w-25 p-4 bg-white shadow">
             <h2 class="text-center">Đăng nhập</h2>
+
+            <% if (errorMessage) { %>
+                <div class="alert alert-danger">
+                    <%= errorMessage %>
+                </div>
+            <% } %>
+
             <form action="/login" method="POST">
                 <div class="mb-3">
                     <label for="username" class="form-label">Tài Khoản</label>
@@ -33,7 +40,7 @@
             </form>
             <div class="mt-3 text-center">
                 <span>Chưa có tài khoản</span>
-                <a href="/create" class="text-center ">Đăng ký</a>
+                <a href="/create-new-user" class="text-center ">Đăng ký</a>
             </div>
         </div>
     </div>
