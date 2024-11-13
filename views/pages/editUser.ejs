@@ -1,0 +1,103 @@
+<div class="container w-75 my-3">
+    <h2  class="mb-3">Cập nhật thông tin %></h2>
+
+    <% if (updateErrorMessage) { %>
+        <div class="alert alert-danger" role="alert">
+            <%= updateErrorMessage %>
+        </div>
+    <% } %>
+
+    <% if (updateSuccessMessage) { %>
+        <div class="alert alert-success" role="alert">
+            <%= updateSuccessMessage %>
+        </div>
+        <script>
+            setTimeout(() => {
+                window.location.href = '/detail-user/<%= user.username %>';
+            }, 1000);
+        </script>
+    <% } %>
+
+    <form action="/update-user" method="POST">
+        <table class="table table-striped table-bordered">
+            <thead>
+                <tr>
+                    <th>Thông tin</th>
+                    <th>Giá trị</th>
+                    <th>Edit</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>Họ và tên</strong></td>
+                    <td>
+                        <span id="fullname-view"><%= user.fullname %></span>
+                        <input type="text" id="fullname-input" name="fullname" value="<%= user.fullname %>" class="form-control d-none" />
+                    </td>
+                    <td class="text-center">
+                        <i class="fas fa-edit text-yellow-500" onclick="toggleEdit('fullname')" style="cursor: pointer;"></i>
+                    </td>
+                </tr>
+                <tr>
+                    <td><strong>Tài khoản</strong></td>
+                    <td>
+                        <span id="username-view"><%= user.username %></span>
+                        <input type="hidden" id="username-input" name="username" value="<%= user.username %>" class="form-control d-none" />
+                    </td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td><strong>Giới tính</strong></td>
+                    <td>
+                        <span id="sex-view"><%= user.sex %></span>
+                        <select id="sex-input" name="sex" class="form-select d-none">
+                            <option value="Nam" <%= user.sex === 'Nam' ? 'selected' : '' %>>Nam</option>
+                            <option value="Nữ" <%= user.sex === 'Nữ' ? 'selected' : '' %>>Nữ</option>
+                            <option value="Khác" <%= user.sex === 'Khác' ? 'selected' : '' %>>Khác</option>
+                        </select>
+                    </td>
+                    <td class="text-center">
+                        <i class="fas fa-edit text-yellow-500" onclick="toggleEdit('sex')" style="cursor: pointer;"></i>
+                    </td>
+                </tr>
+                <tr>
+                    <td><strong>Email</strong></td>
+                    <td>
+                        <span id="email-view"><%= user.email %></span>
+                        <input type="email" id="email-input" name="email" value="<%= user.email %>" class="form-control d-none" />
+                    </td>
+                    <td class="text-center">
+                        <i class="fas fa-edit text-yellow-500" onclick="toggleEdit('email')" style="cursor: pointer;"></i>
+                    </td>
+                </tr>
+                <tr>
+                    <td><strong>Địa chỉ</strong></td>
+                    <td>
+                        <span id="address-view"><%= user.address %></span>
+                        <textarea id="address-input" name="address" class="form-control d-none"><%= user.address %></textarea>
+                    </td>
+                    <td class="text-center">
+                        <i class="fas fa-edit text-yellow-500" onclick="toggleEdit('address')" style="cursor: pointer;"></i>
+                    </td>
+                </tr>
+                <tr>
+                    <td><strong>Quyền</strong></td>
+                    <td>
+                        <span id="groupid-view"><%= user.groupid %></span>
+                        <select id="groupid-input" name="groupid" class="form-select d-none">
+                            <option value="Admin" <%= user.groupid === 'Admin' ? 'selected' : '' %>>Admin</option>
+                            <option value="User" <%= user.groupid === 'User' ? 'selected' : '' %>>User</option>
+                        </select>
+                    </td>
+                    <td class="text-center">
+                        <i class="fas fa-edit text-yellow-500" onclick="toggleEdit('groupid')" style="cursor: pointer;"></i>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        <div class="d-flex justify-content-center mt-3">
+            <a href="/detail-user/<%= user.username %>" class="btn btn-secondary mx-2">Quay lại</a>
+            <button type="submit" class="btn btn-success btn-sm">Lưu</button>
+        </div>
+    </form>
+</div>

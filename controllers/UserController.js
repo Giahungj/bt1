@@ -4,7 +4,11 @@ import { checkEmailExists } from "../model/useModel"
 import { getHashPassword } from "../model/useModel"
 import { getUsers } from "../model/useModel"
 import { getDetailUserModel } from "../model/useModel"
+import { getTotalUsers } from "../model/useModel"
+import { updateUserModel } from "../model/useModel"
+import { deleteUserModel } from "../model/useModel"
 import bcrypt from 'bcrypt';
+import { get404Page } from "./404Controller"
 
 export const getNewUserPage = (req, res) => {
     res.render('pages/newUser', { title: 'Đăng ký', successMessage: '', errorMessage: '' });
@@ -15,14 +19,98 @@ export const getLoginPage = (req, res) => {
 }
 
 export const getUserListPage = async (req, res) => {
-    const users = await getUserListData()
-    res.render('layout', { page: 'pages/listUser', title: 'Danh sách tài khoản', errorMessage: '', users: users });
+    const page = parseInt(req.query.page) || 1
+    const limit = 2
+    const offset = (page - 1) * limit
+    
+    const users = await getUserListData(offset, limit)
+    const totalUsers = await getTotalUsers()
+    const totalPages = Math.ceil(totalUsers / limit)
+    res.render('layout', {
+        page: 'pages/listUser',
+        title: 'Danh sách tài khoản',
+        deleteErrorMessage: '',
+        deleteSuccessMessage: '',
+        users: users,
+        currentPage: page,
+        totalPages,
+        offset
+    })
 }
 
 export const getDetailUserPage = async (req, res) => {
     const { username } = req.params
     const user = await getDetailUserData(username)
     res.render('layout', { page: 'pages/detailUser', title: 'Chi tiết người dùng', errorMessage: '', user: user });
+}
+
+export const getEditUserPage = async (req, res) => {
+    const { username } = req.params
+    const user = await getDetailUserData(username)
+    return res.render('layout', { page: 'pages/editUser',
+        title: 'Thay đổi thông tin người dùng',
+        updateErrorMessage: '',
+        updateSuccessMessage: '',
+        user: user });
+}
+
+export const updateUser = async (req, res) => {
+    let { username, fullname, sex, email, address, groupid } = req.body
+
+    if (!username || !fullname || !sex || !email || !address || !groupid) {
+        return res.status(400).send('Thiếu thông tin cần thiết')
+    }
+
+    if (groupid === 'Admin') {
+        groupid = 1
+    } else if (groupid === 'User') {
+        groupid = 2
+    } else {
+        return res.render('layout', { 
+            page: 'pages/editUser', 
+            title: 'Chi tiết người dùng', 
+            updateErrorMessage: 'Giá trị quyền không hợp lệ', 
+            updateSuccessMessage: '', 
+            user: userDetails 
+        })
+    }
+
+    if (sex === 'Nam') {
+        sex = 'Male'
+    } else if (sex === 'Nữ') {
+        sex = 'Female'
+    } else if (sex === 'Khác') {
+        sex = 'Other'
+    } else {
+        return res.render('layout', { 
+            page: 'pages/editUser', 
+            title: 'Chi tiết người dùng', 
+            updateErrorMessage: 'Giá trị giới tính không hợp lệ', 
+            updateSuccessMessage: '', 
+            user: userDetails 
+        })
+    }
+
+    const updateResult = await updateUserModel(username, { fullname, sex, email, address, groupid })
+    const userDetails = await getDetailUserData(username)
+
+    if (!updateResult) {
+        return res.render('layout', { 
+            page: 'pages/editUser', 
+            title: 'Chi tiết người dùng', 
+            updateErrorMessage: 'Có lỗi xảy ra khi cập nhật', 
+            updateSuccessMessage: '', 
+            user: userDetails 
+        })
+    }
+
+    return res.render('layout', { 
+        page: 'pages/editUser', 
+        title: 'Chi tiết người dùng', 
+        updateErrorMessage: '', 
+        updateSuccessMessage: 'Cập nhật thành công', 
+        user: userDetails 
+    })
 }
 
 export const authAccount = async (req, res) => {
@@ -98,8 +186,8 @@ export const comparePassword = async (password, hashPassword) => {
     }
 }
 
-export const getUserListData = async (req, res) => {
-    const users = await getUsers()
+export const getUserListData = async (offset, limit) => {
+    const users = await getUsers(offset, limit)
     const formattedUsers = users.map(user => {
         return {
             fullname: user.fullname,
@@ -131,4 +219,19 @@ export const getDetailUserData = async (username) => {
         console.error('Lỗi xem nguời dùng:', error)
     }
     
+}
+
+export const deleteUser = async (req, res) => {
+    const { username } = req.params
+    try {
+        const isDeleted = await deleteUserModel(username)
+        if (isDeleted) {
+            return res.redirect('/list-user')
+        } else {
+            res.redirect('/list-user?deleteErrorMessage=Không thể xóa người dùng')
+        }
+    } catch (error) {
+        console.error(error)
+        return get404Page
+    }
 }

@@ -59,10 +59,12 @@ export const getHashPassword = async (username) => {
     }
 }
 
-export const getUsers = async () => {
+export const getUsers = async (offset, limit) => {
     try {
         const connection = await connect()
-        const [rows] = await connection.execute('SELECT fullname, username, sex, email, address, groupid FROM users')
+        const [rows] = await connection.execute('SELECT fullname, username, sex, email, address, groupid FROM users LIMIT ? OFFSET ?',
+            [limit, offset]
+        )
         return rows
     } catch (error) {
         console.error('Lỗi khi lấy Danh sách tài khoản:', error)
@@ -78,5 +80,43 @@ export const getDetailUserModel = async (username) => {
     } catch (error) {
         console.error('Lỗi khi lấy Danh sách tài khoản:', error)
         return []
+    }
+}
+
+export const updateUserModel = async (username, { fullname, sex, email, address, groupid }) => {
+    try {
+        const connection = await connect()
+        const query = `
+            UPDATE users 
+            SET fullname = ?, sex = ?, email = ?, address = ?, groupid = ? 
+            WHERE username = ?`
+        const [result] = await connection.execute(query, [fullname, sex, email, address, groupid, username])
+        return result.affectedRows > 0
+    } catch (error) {
+        console.error('Lỗi khi cập nhật người dùng:', error)
+        return false
+    }
+}
+
+export const getTotalUsers = async () => {
+    try {
+        const connection = await connect();
+        const [rows] = await connection.execute('SELECT COUNT(*) as count FROM users')
+        return rows[0].count
+    } catch (error) {
+        console.error('Lỗi khi lấy tổng số người dùng:', error)
+        return 0
+    }
+}
+
+export const deleteUserModel = async (username) => {
+    try {
+        const connection = await connect();
+        const query = 'DELETE FROM users WHERE username = ?';
+        const [result] = await connection.execute(query, [username]);
+        return result.affectedRows > 0;
+    } catch (error) {
+        console.error('Lỗi khi xóa người dùng:', error);
+        return false;
     }
 }

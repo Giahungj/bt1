@@ -1,0 +1,22 @@
+<nav aria-label="Page navigation">
+    <ul class="pagination justify-content-end">
+      <li class="page-item <%= currentPage === 1 ? 'disabled' : '' %>">
+        <a class="page-link" href="?page=<%= currentPage - 1 %>" tabindex="-1" aria-disabled="<%= currentPage === 1 %>">
+          Trang trước
+        </a>
+      </li>
+  
+      <% for (let i = 1; i <= totalPages; i++) { %>
+        <li class="page-item <%= i === currentPage ? 'active' : '' %>">
+          <a class="page-link" href="?page=<%= i %>"><%= i %></a>
+        </li>
+      <% } %>
+  
+      <li class="page-item <%= currentPage === totalPages ? 'disabled' : '' %>">
+        <a class="page-link" href="?page=<%= currentPage + 1 %>">
+          Trang sau
+        </a>
+      </li>
+    </ul>
+  </nav>
+  

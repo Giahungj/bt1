@@ -1,4 +1,20 @@
 <div class="container">
+    <% if (deleteErrorMessage) { %>
+        <div class="alert alert-danger m-0" role="alert">
+            <i class="fas fa-times-circle"></i> <%= deleteErrorMessage %>
+        </div>
+    <% } %>
+
+    <% if (deleteSuccessMessage) { %>
+        <div class="alert alert-success m-0" role="alert">
+            <%= deleteSuccessMessage %>
+        </div>
+        <script>
+            setTimeout(() => {
+                window.location.href = '/detail-user/<%= user.username %>';
+            }, 1000);
+        </script>
+    <% } %>
     <table class="table table-light table-striped table-bordered border-secondary caption-top">
         <caption>Danh sách tài khoản</caption>
         <thead class="text-center">
@@ -16,7 +32,7 @@
         <tbody>
             <% users.forEach((user, index) => { %>
                 <tr>
-                    <td><%= index + 1 %></td>
+                    <td><%= offset + index + 1 %></td>
                     <td><%= user.fullname %></td> 
                     <td><%= user.username %></td> 
                     <td><%= user.sex %></td>
@@ -30,7 +46,7 @@
                         <a href="/edit-user/<%= user.username %>" class="btn btn-outline-primary">
                             <i class="fas fa-pencil-alt"></i>
                         </a>
-                        <a href="/delete-user/<%= user.username %>" class="btn btn-outline-danger">
+                        <a href="javascript:void(0)" class="btn btn-outline-danger" onclick="showMessage('<%= user.username %>')">
                             <i class="fas fa-trash"></i>
                         </a>
                     </td>
@@ -38,4 +54,5 @@
             <% }) %>
         </tbody>
     </table>
+    <%- include ('./pagination') %>
 </div>
