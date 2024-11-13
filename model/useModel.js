@@ -58,3 +58,25 @@ export const getHashPassword = async (username) => {
         return { success: false, message: 'Có lỗi xảy ra, vui lòng thử lại' }
     }
 }
+
+export const getUsers = async () => {
+    try {
+        const connection = await connect()
+        const [rows] = await connection.execute('SELECT fullname, username, sex, email, address, groupid FROM users')
+        return rows
+    } catch (error) {
+        console.error('Lỗi khi lấy Danh sách tài khoản:', error)
+        return []
+    }
+}
+
+export const getDetailUserModel = async (username) => {
+    try {
+        const connection = await connect()
+        const [row] = await connection.execute('SELECT fullname, username, sex, email, address, groupid FROM users WHERE username = ?', [username])
+        return row[0]
+    } catch (error) {
+        console.error('Lỗi khi lấy Danh sách tài khoản:', error)
+        return []
+    }
+}

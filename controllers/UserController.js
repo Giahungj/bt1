@@ -2,15 +2,28 @@ import { importUser } from "../model/useModel"
 import { checkUsernameExists } from "../model/useModel"
 import { checkEmailExists } from "../model/useModel"
 import { getHashPassword } from "../model/useModel"
+import { getUsers } from "../model/useModel"
+import { getDetailUserModel } from "../model/useModel"
 import bcrypt from 'bcrypt';
 
 export const getNewUserPage = (req, res) => {
     res.render('pages/newUser', { title: 'Đăng ký', successMessage: '', errorMessage: '' });
-};
+}
 
 export const getLoginPage = (req, res) => {
     res.render('pages/login', { title: 'Đăng nhập', errorMessage: '' });
-};
+}
+
+export const getUserListPage = async (req, res) => {
+    const users = await getUserListData()
+    res.render('layout', { page: 'pages/listUser', title: 'Danh sách tài khoản', errorMessage: '', users: users });
+}
+
+export const getDetailUserPage = async (req, res) => {
+    const { username } = req.params
+    const user = await getDetailUserData(username)
+    res.render('layout', { page: 'pages/detailUser', title: 'Chi tiết người dùng', errorMessage: '', user: user });
+}
 
 export const authAccount = async (req, res) => {
     const { username, password } = req.body
@@ -83,5 +96,39 @@ export const comparePassword = async (password, hashPassword) => {
         console.error('Lỗi khi so sánh mật khẩu:', error)
         return false
     }
-  }
-  
+}
+
+export const getUserListData = async (req, res) => {
+    const users = await getUsers()
+    const formattedUsers = users.map(user => {
+        return {
+            fullname: user.fullname,
+            username: user.username,
+            sex: user.sex === 'male' ? 'Nam' : user.sex === 'female' ? 'Nữ' : user.sex,
+            email: user.email,
+            address: user.address,
+            groupid: user.groupid === 1 ? 'Admin' : user.groupid === 2 ? 'User' : 'Unknown'
+        }
+    })
+    
+    return formattedUsers
+}
+
+export const getDetailUserData = async (username) => {
+    try {
+        const user = await getDetailUserModel(username)
+        const formattedUser = {
+            fullname: user.fullname,
+            username: user.username,
+            sex: user.sex === 'male' ? 'Nam' : user.sex === 'female' ? 'Nữ' : user.sex,
+            email: user.email,
+            address: user.address,
+            groupid: user.groupid === 1 ? 'Admin' : user.groupid === 2 ? 'User' : 'Unknown'
+        }
+        
+        return formattedUser
+    } catch (error) {
+        console.error('Lỗi xem nguời dùng:', error)
+    }
+    
+}

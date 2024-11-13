@@ -1,0 +1,41 @@
+<div class="container">
+    <table class="table table-light table-striped table-bordered border-secondary caption-top">
+        <caption>Danh sách tài khoản</caption>
+        <thead class="text-center">
+            <tr>
+                <th>STT</th>
+                <th>Tên</th>
+                <th>Tài khoản</th>
+                <th>Giới tính</th>
+                <th>Email</th>
+                <th>Địa chỉ</th>
+                <th>Quyền</th>
+                <th>Cấu hình</th>
+            </tr>
+        </thead>
+        <tbody>
+            <% users.forEach((user, index) => { %>
+                <tr>
+                    <td><%= index + 1 %></td>
+                    <td><%= user.fullname %></td> 
+                    <td><%= user.username %></td> 
+                    <td><%= user.sex %></td>
+                    <td><%= user.email %></td>
+                    <td><%= user.address %></td>
+                    <td><%= user.groupid %></td>
+                    <td>
+                        <a href="/detail-user/<%= user.username %>" class="btn btn-outline-info">
+                            <i class="fas fa-eye"></i>
+                        </a>
+                        <a href="/edit-user/<%= user.username %>" class="btn btn-outline-primary">
+                            <i class="fas fa-pencil-alt"></i>
+                        </a>
+                        <a href="/delete-user/<%= user.username %>" class="btn btn-outline-danger">
+                            <i class="fas fa-trash"></i>
+                        </a>
+                    </td>
+                </tr>
+            <% }) %>
+        </tbody>
+    </table>
+</div>

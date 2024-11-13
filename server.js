@@ -1,5 +1,6 @@
 import express from 'express';
 import dotenv from 'dotenv/config';
+import session from 'express-session'
 import path from 'path';
 import viewEngine from './viewEngine';
 import mainRoutes from './routes/mainRoute';
@@ -20,7 +21,6 @@ app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
 
 const port = process.env.PORT
-
 app.use(express.static(path.join(__dirname, 'public')))
 viewEngine(app)
 

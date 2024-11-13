@@ -1,5 +1,7 @@
 import express from 'express';
 import { getHomePage } from '../controllers/homeController.js';
+import { getUserListPage } from '../controllers/UserController.js';
+import { getDetailUserPage } from '../controllers/UserController.js';
 import { getAboutPage } from '../controllers/aboutController.js';
 import { getContactPage } from '../controllers/contactController.js';
 import { get404Page } from '../controllers/404Controller.js';
@@ -11,6 +13,8 @@ import { createUser } from '../controllers/UserController.js';
 const router = express.Router();
 
 router.get('/', getHomePage);
+router.get('/list-user', getUserListPage);
+router.get('/detail-user/:username', getDetailUserPage);
 router.get('/about', getAboutPage);
 router.get('/contact', getContactPage);
 router.get('/create-new-user', getNewUserPage);
