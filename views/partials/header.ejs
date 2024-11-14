@@ -15,9 +15,16 @@
                 <a class="nav-link" aria-current="page" href="/list-user">Danh sách tài khoản</a>
             </li>
 
-            <li class="nav-item">
-                <a class="nav-link" aria-current="page" href="/list-product">Danh sách sản phẩm</a>
+            <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" id="productDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    Sản phẩm
+                </a>
+                <ul class="dropdown-menu" aria-labelledby="productDropdown">
+                    <li><a class="dropdown-item" href="/list-product">Danh sách sản phẩm</a></li>
+                    <li><a class="dropdown-item" href="/add-product">Thêm sản phẩm</a></li>
+                </ul>
             </li>
+            
         <% } %>
         
         <% if (usernameSession) { %>
@@ -29,7 +36,7 @@
             </li>
         
             <li class="nav-item">
-                <a class="nav-link" aria-current="page" href="/login"><i class="fa-solid fa-arrow-right-from-bracket"></i></a>
+                <a class="nav-link" aria-current="page" href="/logout"><i class="fa-solid fa-arrow-right-from-bracket"></i></a>
             </li>
         <% } else { %>
             <li class="nav-item">

@@ -1,0 +1,68 @@
+<div class="container w-75 my-3">
+    <h2  class="mb-3">Cập nhật thông tin %></h2>
+
+    <% if (updateErrorMessage) { %>
+        <div class="alert alert-danger" role="alert">
+            <%= updateErrorMessage %>
+        </div>
+    <% } %>
+
+    <% if (updateSuccessMessage) { %>
+        <div class="alert alert-success" role="alert">
+            <%= updateSuccessMessage %>
+        </div>
+        <script>
+            setTimeout(() => {
+                window.location.href = '/detail-user/<%= user.username %>';
+            }, 1000);
+        </script>
+    <% } %>
+
+    <form action="/update-product" method="POST">
+        <table class="table table-striped table-bordered">
+            <thead>
+                <tr>
+                    <th>Thông tin</th>
+                    <th>Giá trị</th>
+                    <th>Edit</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>Tên sản phẩm</strong></td>
+                    <td>
+                        <span id="name-view"><%= product.name %></span>
+                        <input type="text" id="name-input" name="productName" value="<%= product.name %>" class="form-control d-none" />
+                    </td>
+                    <td class="text-center">
+                        <i class="fas fa-edit text-yellow-500" onclick="toggleEdit('name')" style="cursor: pointer;"></i>
+                    </td>
+                </tr>
+                <tr>
+                    <td><strong>Mô tả</strong></td>
+                    <td>
+                        <span id="description-view"><%= product.description %></span>
+                        <textarea id="description-input" name="ProductDescription" value="<%= product.description %>" class="form-control d-none"><%= product.description %></textarea>
+                    </td>
+                    <td>
+                        <i class="fas fa-edit text-yellow-500" onclick="toggleEdit('description')" style="cursor: pointer;"></i>
+                    </td>
+                </tr>
+                <tr>
+                    <td><strong>Giá</strong></td>
+                    <td>
+                        <span id="price-view"><%= product.price %></span>
+                        <input type="text" id="price-input" name="productPrice" value="<%= product.price %>" class="form-control d-none" />
+                    </td>
+                    <td class="text-center">
+                        <i class="fas fa-edit text-yellow-500" onclick="toggleEdit('price')" style="cursor: pointer;"></i>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        <div class="d-flex justify-content-center mt-3">
+            <a href="/detail-product/<%= product.name %>" class="btn btn-secondary mx-2">Quay lại</a>
+            <button type="submit" class="btn btn-success btn-sm">Lưu</button>
+        </div>
+    </form>
+</div>

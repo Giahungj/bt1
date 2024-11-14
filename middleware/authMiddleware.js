@@ -7,7 +7,7 @@ export const createSession = (req, usernameSession, roleSession) => {
 }
 
 export const getSessionData = (req) => {
-    const { usernameSession, roleSession } = req.session || {}
+    const { usernameSession, roleSession } = req.session || { }
     if (!usernameSession || !roleSession) {
         return null
     }
@@ -18,7 +18,7 @@ export const isAdmin = (req, res, next) => {
     if (!req.session || !req.session.roleSession || !req.session.usernameSession) {
         return res.redirect('/login')
     }
-    const { usernameSession, roleSession } = req.session || {}
+    const { usernameSession, roleSession } = req.session || { }
     if (roleSession !== 'Admin') {
         return res.render('layout', { page: 'pages/404', title: 'Trang không tồn tại', usernameSession, roleSession })
     }

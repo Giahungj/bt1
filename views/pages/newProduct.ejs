@@ -1,0 +1,39 @@
+<div class="container w-25 my-5 border rounded shadow">
+    <h2 class="my-2">THÊM SẢN PHẨM</h2>
+
+    <% if (errorMessage) { %>
+        <div class="alert alert-danger">
+            <%= errorMessage %>
+        </div>
+    <% } else if (successMessage) { %>
+        <div class="alert alert-success">
+            <%= successMessage %>
+        </div>
+        <script>
+            setTimeout(() => {
+                window.location.href = '/detail-product/<%= product.name %>';
+            }, 1000);
+        </script>
+    <% } %>
+
+    <form action="/add-product" method="POST">
+        <div class="mb-3">
+            <label for="productName" class="form-label">Tên sản phẩm</label>
+            <input type="text" class="form-control" id="productName" name="productName" required>
+        </div>
+
+        <div class="mb-3">
+            <label for="productDescription" class="form-label">Mô tả sản phẩm</label>
+            <textarea class="form-control" id="productDescription" name="productDescription" rows="3" required></textarea>
+        </div>
+
+        <div class="mb-3">
+            <label for="productPrice" class="form-label">Giá sản phẩm</label>
+            <input type="number" class="form-control" id="productPrice" name="productPrice" required>
+        </div>
+
+        <div class="text-center my-2">
+            <button type="submit" class="btn btn-primary">Thêm sản phẩm</button>
+        </div>
+    </form>
+</div>
