@@ -10,11 +10,27 @@
         <li class="nav-item">
             <a class="nav-link" aria-current="page" href="/contact">Liên hệ</a>
         </li>
-        <li class="nav-item">
-            <a class="nav-link" aria-current="page" href="/list-user">Danh sách tài khoản</a>
-        </li>
-        <li class="nav-item">
-            <a class="btn btn-outline-danger" aria-current="page" href="/login">Đăng xuất</a>
-        </li>
-    </ul>
+        <% if (roleSession === 'Admin') { %>
+            <li class="nav-item">
+                <a class="nav-link" aria-current="page" href="/list-user">Danh sách tài khoản</a>
+            </li>
+        <% } %>
+        
+        <% if (usernameSession) { %>
+            <li class="nav-item">
+                <a class="nav-link d-flex align-items-center gap-2" href="/detail-user/<%= usernameSession %>">
+                    <span class="fw-semibold"><%= usernameSession %></span>
+                    <i class="fa-solid fa-circle-user fs-5"></i>
+                </a>
+            </li>
+        
+            <li class="nav-item">
+                <a class="nav-link" aria-current="page" href="/login"><i class="fa-solid fa-arrow-right-from-bracket"></i></a>
+            </li>
+        <% } else { %>
+            <li class="nav-item">
+                <a class="nav-link" aria-current="page" href="/login">Đăng nhập</i></a>
+            </li>
+        <% } %>
+        </ul>
 </div>

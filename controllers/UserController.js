@@ -7,54 +7,101 @@ import { getDetailUserModel } from "../model/useModel"
 import { getTotalUsers } from "../model/useModel"
 import { updateUserModel } from "../model/useModel"
 import { deleteUserModel } from "../model/useModel"
+import { createSession } from "../middleware/authMiddleware"
+import { getSessionData } from "../middleware/authMiddleware"
 import bcrypt from 'bcrypt';
-import { get404Page } from "./404Controller"
 
 export const getNewUserPage = (req, res) => {
-    res.render('pages/newUser', { title: 'Đăng ký', successMessage: '', errorMessage: '' });
+    return res.render('pages/newUser', { title: 'Đăng ký', successMessage: '', errorMessage: '' });
 }
 
 export const getLoginPage = (req, res) => {
-    res.render('pages/login', { title: 'Đăng nhập', errorMessage: '' });
+    return res.render('pages/login', { title: 'Đăng nhập', errorMessage: '' });
 }
 
 export const getUserListPage = async (req, res) => {
-    const page = parseInt(req.query.page) || 1
-    const limit = 2
-    const offset = (page - 1) * limit
-    
-    const users = await getUserListData(offset, limit)
-    const totalUsers = await getTotalUsers()
-    const totalPages = Math.ceil(totalUsers / limit)
-    res.render('layout', {
-        page: 'pages/listUser',
-        title: 'Danh sách tài khoản',
-        deleteErrorMessage: '',
-        deleteSuccessMessage: '',
-        users: users,
-        currentPage: page,
-        totalPages,
-        offset
-    })
+    try {
+        const sessionData = getSessionData(req)
+
+        if (!sessionData) {
+            return res.redirect('/login')
+        }
+        const { usernameSession, roleSession } = sessionData
+
+        const page = parseInt(req.query.page) || 1
+        const limit = 10
+        const offset = (page - 1) * limit
+        
+        const users = await getUserListData(offset, limit)
+        const totalUsers = await getTotalUsers()
+        const totalPages = Math.ceil(totalUsers / limit)
+        res.render('layout', {
+            page: 'pages/listUser',
+            title: 'Danh sách tài khoản',
+            deleteErrorMessage: '',
+            deleteSuccessMessage: '',
+            users: users,
+            currentPage: page,
+            totalPages,
+            offset,
+            usernameSession,
+            roleSession,
+        })
+    } catch (error) {
+        console.error(error)
+    }
 }
 
 export const getDetailUserPage = async (req, res) => {
     const { username } = req.params
     const user = await getDetailUserData(username)
-    res.render('layout', { page: 'pages/detailUser', title: 'Chi tiết người dùng', errorMessage: '', user: user });
+
+    const sessionData = getSessionData(req)
+
+    if (!sessionData) {
+        return res.redirect('/login')
+    }
+    const { usernameSession, roleSession } = sessionData
+
+    res.render('layout', { 
+        page: 'pages/detailUser',
+        title: 'Chi tiết người dùng',
+        errorMessage: '',
+        user: user,
+        usernameSession,
+        roleSession
+    })
 }
 
 export const getEditUserPage = async (req, res) => {
+    const sessionData = getSessionData(req)
+
+    if (!sessionData) {
+        return res.redirect('/login')
+    }
+    const { usernameSession, roleSession } = sessionData
+
     const { username } = req.params
     const user = await getDetailUserData(username)
-    return res.render('layout', { page: 'pages/editUser',
+    return res.render('layout', { 
+        page: 'pages/editUser',
         title: 'Thay đổi thông tin người dùng',
         updateErrorMessage: '',
         updateSuccessMessage: '',
-        user: user });
+        user: user,
+        usernameSession,
+        roleSession
+    });
 }
 
 export const updateUser = async (req, res) => {
+    const sessionData = getSessionData(req)
+
+    if (!sessionData) {
+        return res.redirect('/login')
+    }
+    const { usernameSession, roleSession } = sessionData
+
     let { username, fullname, sex, email, address, groupid } = req.body
 
     if (!username || !fullname || !sex || !email || !address || !groupid) {
@@ -71,7 +118,9 @@ export const updateUser = async (req, res) => {
             title: 'Chi tiết người dùng', 
             updateErrorMessage: 'Giá trị quyền không hợp lệ', 
             updateSuccessMessage: '', 
-            user: userDetails 
+            user: userDetails,
+            usernameSession,
+            roleSession
         })
     }
 
@@ -87,7 +136,9 @@ export const updateUser = async (req, res) => {
             title: 'Chi tiết người dùng', 
             updateErrorMessage: 'Giá trị giới tính không hợp lệ', 
             updateSuccessMessage: '', 
-            user: userDetails 
+            user: userDetails,
+            usernameSession,
+            roleSession
         })
     }
 
@@ -100,7 +151,9 @@ export const updateUser = async (req, res) => {
             title: 'Chi tiết người dùng', 
             updateErrorMessage: 'Có lỗi xảy ra khi cập nhật', 
             updateSuccessMessage: '', 
-            user: userDetails 
+            user: userDetails,
+            usernameSession,
+            roleSession
         })
     }
 
@@ -109,7 +162,9 @@ export const updateUser = async (req, res) => {
         title: 'Chi tiết người dùng', 
         updateErrorMessage: '', 
         updateSuccessMessage: 'Cập nhật thành công', 
-        user: userDetails 
+        user: userDetails,
+        usernameSession,
+        roleSession
     })
 }
 
@@ -128,15 +183,17 @@ export const authAccount = async (req, res) => {
     const hashPassword =  await getHashPassword(username)
     const isPasswordValid = await comparePassword(password, hashPassword)
     if (isPasswordValid) {
+        const user = await getDetailUserData(username)
+        const roleSession = user.groupid
+        createSession(req, username, roleSession)
         return res.redirect('/')
     } else {
-        return res.render('pages/login', { title: 'Đăng nhập', errorMessage: 'Sai mật khẩu' })
+        return res.render('layout', { page: 'pages/login', title: 'Đăng nhập', errorMessage: 'Sai mật khẩu' })
     }
 }
 
 export const createUser = async (req, res) => {
     const { fullname, username, password, gender, email, address, role } = req.body
-    console.log('Thông tin đăng ký giai đoạn 1: ', req.body )
 
     const isUsernameAvailable = await checkUsernameExists(username)
     if (!isUsernameAvailable) {
@@ -153,7 +210,6 @@ export const createUser = async (req, res) => {
     }
 
     const hashedPassword = await hashPassword(password)
-    console.log('Mật khẩu đã băm giai đoạn 2: ', hashedPassword )
   
     try {
         const result = importUser(username, hashedPassword, fullname, address, gender, email, role)
@@ -228,10 +284,10 @@ export const deleteUser = async (req, res) => {
         if (isDeleted) {
             return res.redirect('/list-user')
         } else {
-            res.redirect('/list-user?deleteErrorMessage=Không thể xóa người dùng')
+            return res.redirect('/list-user')
         }
     } catch (error) {
         console.error(error)
-        return get404Page
+        return res.redirect('/')
     }
 }

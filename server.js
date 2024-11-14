@@ -17,6 +17,13 @@ connect()
     process.exit(1)
 })
 
+app.use(session({
+    secret: '4e3a4c94b924b86a737fbb03e75df7e892efb7edc45c3a8e0ef275c9fa8b12ffb51f3a6db2c88231cbf89f9da7a9d0e7b8bb6624f3f5a8b3b93f9575f6b1d1c8',
+    resave: false,
+    saveUninitialized: true,
+    cookie: { secure: false }
+}));
+
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
 
