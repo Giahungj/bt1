@@ -29,8 +29,27 @@ function showMessage(username) {
     document.body.prepend(messageDiv);
 }
 
+function showMessageDelProduct(name) {
+    const message = 'Bạn có chắc chắn muốn xóa sản phẩm này?';
+    const messageDiv = document.createElement('div');
+    messageDiv.classList.add('alert', 'alert-warning');
+    messageDiv.setAttribute('role', 'alert');
+    
+    messageDiv.innerHTML = `
+        <p>${message}</p>
+        <button class="btn btn-success" onclick="deleteProduct('${name}')">Có</button>
+        <button class="btn btn-danger" onclick="closeMessage()">Hủy</button>
+    `;
+    
+    document.body.prepend(messageDiv);
+}
+
 function deleteUser(username) {
     window.location.href = `/delete-user/${username}`;
+}
+
+function deleteProduct(name) {
+    window.location.href = `/delete-product/${name}`;
 }
 
 function closeMessage() {

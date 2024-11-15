@@ -13,7 +13,7 @@
         </div>
         <script>
             setTimeout(() => {
-                window.location.href = '/detail-user/<%= user.username %>';
+                window.location.href = '/detail-product/<%= product.name %>';
             }, 1000);
         </script>
     <% } %>
@@ -33,6 +33,7 @@
                     <td>
                         <span id="name-view"><%= product.name %></span>
                         <input type="text" id="name-input" name="productName" value="<%= product.name %>" class="form-control d-none" />
+                        <input type="hidden" name="productOldName" value="<%= product.name %>" class="form-control d-none" />
                     </td>
                     <td class="text-center">
                         <i class="fas fa-edit text-yellow-500" onclick="toggleEdit('name')" style="cursor: pointer;"></i>
@@ -42,9 +43,9 @@
                     <td><strong>Mô tả</strong></td>
                     <td>
                         <span id="description-view"><%= product.description %></span>
-                        <textarea id="description-input" name="ProductDescription" value="<%= product.description %>" class="form-control d-none"><%= product.description %></textarea>
+                        <textarea id="description-input" name="productDescription" value="<%= product.description %>" class="form-control d-none"><%= product.description %></textarea>
                     </td>
-                    <td>
+                    <td class="text-center">
                         <i class="fas fa-edit text-yellow-500" onclick="toggleEdit('description')" style="cursor: pointer;"></i>
                     </td>
                 </tr>

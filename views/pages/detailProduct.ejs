@@ -32,8 +32,8 @@
             <i class="fas fa-pencil-alt"></i> Chỉnh sửa
         </a>
         
-        <a href="/delete-product/<%= product.name %>" class="btn btn-outline-danger mx-2">
-            <i class="fas fa-trash"></i> Xóa
+        <a href="javascript:void(0)" class="btn btn-outline-danger" onclick="showMessageDelProduct('<%= product.name %>')">
+            <i class="fas fa-trash"></i>
         </a>
     </div>
 </div>

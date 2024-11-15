@@ -50,17 +50,41 @@ export const getDetailProductData = async (productname) => {
     }
 }
 
-export const updateProductModel = async (productName, productDescription, productPrice) => {
+// Model kiểm tra tên sản phẩm đã tồn tại chưa
+export const isProductExist = async (productName) => {
+    try {
+        const connection = await connect()
+        const [row] = await connection.execute('SELECT name FROM products WHERE name = ?', [productName])
+        return row.length === 0
+    } catch (error) {
+        console.error(error)
+        throw error
+    }
+}
+
+export const updateProductModel = async (productOldName, productName, productDescription, productPrice) => {
     try {
         const connection = await connect()
         const query = `
-            UPDATE users 
-            SET fullname = ?, sex = ?, email = ?, address = ?, groupid = ? 
-            WHERE username = ?`
-        const [result] = await connection.execute(query, [fullname, sex, email, address, groupid, productName])
+            UPDATE products
+            SET name = ?, description = ?, price = ?
+            WHERE name = ?`
+        const [result] = await connection.execute(query, [productName, productDescription, productPrice, productOldName])
         return result.affectedRows > 0
     } catch (error) {
         console.error('Lỗi khi cập nhật người dùng:', error)
         return false
+    }
+}
+
+export const deleteProductModel = async (productName) => {
+    try {
+        const connection = await connect();
+        const query = 'DELETE FROM products WHERE name = ?';
+        const [result] = await connection.execute(query, [productName]);
+        return result.affectedRows > 0;
+    } catch (error) {
+        console.error('Lỗi khi xóa người dùng:', error);
+        return false;
     }
 }

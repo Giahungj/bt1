@@ -20,6 +20,7 @@ import { createProduct } from '../controllers/productController.js';
 import { getDetailProductPage } from '../controllers/productController.js';
 import { getEditProductPage } from '../controllers/productController.js';
 import { updateProduct } from '../controllers/productController.js';
+import { deleteProduct } from '../controllers/productController.js';
 
 import { isAdmin } from '../middleware/authMiddleware.js';
 
@@ -43,6 +44,7 @@ router.get('/list-product', isAdmin, getProductListPage);
 router.get('/add-product', isAdmin, getAddProductPage);
 router.get('/detail-product/:productname', isAdmin, getDetailProductPage);
 router.get('/edit-product/:productname', isAdmin, getEditProductPage);
+router.get('/delete-product/:productName', isAdmin, deleteProduct);
 
 router.post('/add-product', isAdmin, createProduct);
 router.post('/update-product', isAdmin, updateProduct);

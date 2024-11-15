@@ -2,6 +2,9 @@ import { getSessionData } from "../middleware/authMiddleware"
 import { addProduct, getTotalProducts } from "../model/productModel"
 import { getProducts } from "../model/productModel"
 import { getDetailProductData } from "../model/productModel"
+import { isProductExist } from "../model/productModel"
+import { updateProductModel } from "../model/productModel"
+import { deleteProductModel } from "../model/productModel"
 
 
 export const getProductListPage = async (req, res) => {
@@ -72,14 +75,39 @@ export const updateProduct = async (req, res) => {
     }
     const { usernameSession, roleSession } = sessionData
 
-    let { productName, productDescription, productPrice } = req.body
+    let { productOldName, productName, productDescription, productPrice } = req.body
 
-    if (!productName || !productDescription || !productPrice) {
-        return res.status(400).send('Thiếu thông tin cần thiết')
+    const product = await getDetailProductData(productOldName)
+    
+    if (productName !== productOldName) {
+        const isProductAvailable = await isProductExist(productName);
+        if (!isProductAvailable) {
+            return res.render('layout', { 
+                page: 'pages/editProduct', 
+                title: 'Chi tiết sản phẩm', 
+                updateErrorMessage: 'Tên sản phẩm đã tồn tại', 
+                updateSuccessMessage: '', 
+                product: product,
+                usernameSession,
+                roleSession
+            })
+        }
     }
 
-    const updateResult = await updateProductModel(productName, productDescription, productPrice)
-    const productDetails = await getDetailProductData(username)
+    if (!productOldName || !productName || !productDescription || !productPrice) {
+        return res.render('layout', { 
+            page: 'pages/editProduct', 
+            title: 'Chi tiết sản phẩm', 
+            updateErrorMessage: 'Thiếu thông tin cần thiết', 
+            updateSuccessMessage: '', 
+            product: product,
+            usernameSession,
+            roleSession
+        })
+    }
+
+    const updateResult = await updateProductModel(productOldName, productName, productDescription, productPrice)
+    const productDetails = await getDetailProductData(productName)
 
     if (!updateResult) {
         return res.render('layout', { 
@@ -98,7 +126,7 @@ export const updateProduct = async (req, res) => {
         title: 'Chi tiết sản phẩm', 
         updateErrorMessage: '', 
         updateSuccessMessage: 'Cập nhật thành công', 
-        user: productDetails,
+        product: productDetails,
         usernameSession,
         roleSession
     })
@@ -151,6 +179,20 @@ export const createProduct = async (req, res) => {
     const { usernameSession, roleSession } = sessionData
     
     const { productName, productDescription, productPrice } = req.body
+
+    // Kiểm tra tên sản phẩm
+    const isProductAvailable = await isProductExist(productName)
+    if (!isProductAvailable) {
+        return res.render('layout', {
+            page: 'pages/newProduct',
+            title: 'Thêm sản phẩm',
+            errorMessage: 'Tên sản phẩm đã tồn tại!',
+            successMessage: '',
+            usernameSession,
+            roleSession,
+        })
+    }
+
     const result = await addProduct(productName, productDescription, productPrice)
 
     if (!result) {
@@ -164,6 +206,8 @@ export const createProduct = async (req, res) => {
         })
     }
 
+    const product = await getDetailProductData(productName)
+
     return res.render('layout', {
         page: 'pages/newProduct',
         title: 'Thêm sản phẩm',
@@ -171,6 +215,7 @@ export const createProduct = async (req, res) => {
         successMessage: 'Thêm sản phẩm thành công',
         usernameSession,
         roleSession,
+        product: product
     })
 }
 
@@ -197,5 +242,20 @@ export const getDetailProductPage = async (req, res) => {
     } catch (error) {
         console.error(error)
         throw error
+    }
+}
+
+export const deleteProduct = async (req, res) => {
+    const { productName } = req.params
+    try {
+        const isDeleted = await deleteProductModel(productName)
+        if (isDeleted) {
+            return res.redirect('/list-product')
+        } else {
+            return res.redirect('/list-product')
+        }
+    } catch (error) {
+        console.error(error)
+        return res.redirect('/')
     }
 }
